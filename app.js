@@ -1,14 +1,13 @@
-var express = require("express");
-var sql = require("node:module");
-
+const express = require("express");
+const signUp = require("./Routes/signUp");
+const signIn = require("./Routes/signIn");
 const app = express();
 
 app.listen(3000, () => {
   console.log("listening on port 3000 ");
 });
 
-app.get("/signUp", (req, res) => {
-  let { username, password } = req.body;
-  console.log(username, password);
-  res.send("here");
-});
+app.use(express.json());
+
+app.use("/signUp", signUp);
+app.use("/signIn", signIn);
