@@ -1,9 +1,11 @@
 const mysql = require("mysql");
+require("dotenv").config();
+
 var connection = mysql.createConnection({
-  host: "localhost",
-  user: "shootingDragon",
-  password: "1793",
-  database: "TMDB",
+  host: process.env.HOST,
+  user: process.env.SQL_USERNAME,
+  password: process.env.SQL_PASSWORD,
+  database: process.env.SQL_DBNAME,
 });
 
 connection.connect(function (err) {

@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const connection = require("../connectDB");
 const { body, validationResult } = require("express-validator");
+require("dotenv").config();
 
 router.get(
   "/",
@@ -19,7 +20,7 @@ router.get(
       let req_password = sql.escape(req.body.password);
       // retrive salt and password from db and then check the password
       connection.query(
-        "select P.PASSWORD,I.EMAIL_ID from ID_PASS P,USER_INFO I where P.USERNAME = ?",
+        "select PASSWORD,USER_ID as ID from ID_PASS  where USERNAME = ?",
         [req_username],
         (error, results, fields) => {
           if (error) {
@@ -27,10 +28,20 @@ router.get(
             return res.status(404).json({ errors: error.sqlMessage });
           }
           if (results.length > 0) {
-            console.log(results);
+            console.log("user_id :" + results[0].ID + " has LOGGED IN...");
             if (!bcrypt.compareSync(req_password, results[0].PASSWORD)) {
               return res.status(403).json({ error: "invalid credentials" });
-            } else return res.status(200).json({ success: "password matched" });
+            } else
+              return res.status(200).json({
+                success: "password matched",
+                token: jwt.sign(
+                  { id: results[0].ID },
+                  process.env.JWT_SECRET_KEY,
+                  {
+                    expiresIn: "15m",
+                  }
+                ),
+              });
           }
           if (fields) console.log(fields);
 
